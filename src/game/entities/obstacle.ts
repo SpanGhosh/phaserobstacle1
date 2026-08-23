@@ -17,6 +17,10 @@ export function createObstacle(scene: Phaser.Scene): Obstacle {
         height,
         0x000000
     ) as Obstacle;
+    obstacle.totalHealth = 100;
+    obstacle.health = obstacle.totalHealth;
+    obstacle.type = 'rock';
+    obstacle.area= width * height;
 
     scene.physics.add.existing(obstacle);
 

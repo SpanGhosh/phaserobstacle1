@@ -15,14 +15,13 @@ export function setupObstacleCollision(
     game.scene.physics.add.collider(
         obstacle,
         game.player,
-        (
-            obstacle: Obstacle,
-            player: Player
-        ) => {
-            if (player.body.bottom <= obstacle.body.top) {
-                return;
-            }
-            stopGame(game);
-        }
+        () => obstaclePlayerCollisionEffect(obstacle, game.player, game),
     );
+}
+
+function obstaclePlayerCollisionEffect(obstacle: Obstacle, player: Player, game: GameState): any {
+    if (player.body.bottom <= obstacle.body.top) {
+        return;
+    }
+    stopGame(game);
 }
