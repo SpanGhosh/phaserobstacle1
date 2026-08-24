@@ -19,6 +19,13 @@ export function setupObstacleSpawner(game: GameState): void {
 }
 export function handleObstacles(game: GameState): void {
     for (const obstacle of game.obstacles) {
+        if (obstacle.destructionTexture) {
+            obstacle.destructionTexture.setPosition(
+                obstacle.x,
+                obstacle.y
+            );
+        }
+
         if (obstacle.x < -100) {
             obstacle.destroy();
         }

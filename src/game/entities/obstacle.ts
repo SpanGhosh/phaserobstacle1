@@ -17,10 +17,33 @@ export function createObstacle(scene: Phaser.Scene): Obstacle {
         height,
         0x000000
     ) as Obstacle;
+
     obstacle.totalHealth = 100;
     obstacle.health = obstacle.totalHealth;
     obstacle.type = 'rock';
-    obstacle.area= width * height;
+    obstacle.area = width * height;
+
+    obstacle.destructionTexture = scene.add.renderTexture(
+        x,
+        y,
+        width,
+        height
+    );
+
+    obstacle.destructionTexture.setOrigin(0.5, 0.5);
+
+    obstacle.destructionTexture.fill(
+        0x000000,
+        1,
+        0,
+        0,
+        width,
+        height
+    );
+
+    obstacle.destructionTexture.render();
+
+    obstacle.setVisible(true);
 
     scene.physics.add.existing(obstacle);
 

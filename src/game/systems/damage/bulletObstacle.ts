@@ -1,5 +1,7 @@
 import type {
     Bullet,
+    DestructionResult,
+    DestructionShape,
     GameState,
     Obstacle,
 } from '../../types/game.js';
@@ -14,9 +16,18 @@ export function handleBulletObstacleCollision(
     obstacle: Obstacle,
     game: GameState
 ): void {
+    const result = getBulletObstacleDamage(
+        bullet,
+        obstacle
+    );
+
+    if (result.amount <= 0) {
+        return;
+    }
+
     damageObstacle(
         obstacle,
-        bullet.damage,
+        result,
         bullet.x,
         bullet.y
     );
@@ -31,26 +42,47 @@ export function handleBulletObstacleCollision(
 
 function damageObstacle(
     obstacle: Obstacle,
-    damage: number,
+    result: DestructionResult,
     impactX: number,
     impactY: number
 ): void {
+    obstacle.health -= result.amount;
 
     const damageArea =
-        (damage / obstacle.totalHealth) * obstacle.area;
-    //simplecalc for now, we can make it more complex later
-    obstacle.health -= damage;
+        (result.amount / obstacle.totalHealth) *
+        obstacle.area;
 
     removeObstacleChunk(
         obstacle,
         impactX,
         impactY,
-        damageArea
+        damageArea,
+        result.shape
     );
 
     if (obstacle.health <= 0) {
         obstacle.destroy();
     }
+}
+
+function getBulletObstacleDamage(
+    bullet: Bullet,
+    obstacle: Obstacle
+): DestructionResult {
+    if (
+        bullet.type === 'metal' &&
+        obstacle.type === 'rock'
+    ) {
+        return {
+            amount: bullet.damage,
+            shape: 'rectangle'
+        };
+    }
+
+    return {
+        amount: 0,
+        shape: 'none'
+    };
 }
 
 
@@ -62,20 +94,39 @@ function removeObstacleChunk(
     obstacle: Obstacle,
     impactX: number,
     impactY: number,
-    damageArea: number
+    damageArea: number,
+    shape: DestructionShape
 ): void {
+    if (
+        shape !== 'rectangle' ||
+        !obstacle.destructionTexture
+    ) {
+        return;
+    }
+
     const chunkSize = Math.sqrt(damageArea);
+
+    const localX =
+        impactX - obstacle.x + obstacle.width / 2;
+
+    const localY =
+        impactY - obstacle.y + obstacle.height / 2;
+
     const chunk = obstacle.scene.add.rectangle(
-        impactX,
-        impactY,
+        0,
+        0,
         chunkSize,
-        chunkSize
+        chunkSize,
+        0xffffff
     );
-    console.log(
-        'damage area',
-        damageArea,
-        'Impact:',
-        impactX,
-        impactY
+
+    obstacle.destructionTexture.erase(
+        chunk,
+        localX,
+        localY
     );
+
+    obstacle.destructionTexture.render();
+
+    chunk.destroy();
 }

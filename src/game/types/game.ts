@@ -11,7 +11,8 @@ export type Obstacle = Phaser.GameObjects.Rectangle & {
     health: number,
     type: 'rock' | 'ice' | 'fire' | 'diamond' | 'metal',
     area: number,
-    totalHealth: number
+    totalHealth: number,
+    destructionTexture: Phaser.GameObjects.RenderTexture | null;
 };
 
 export type Bullet = Phaser.GameObjects.Rectangle & {
@@ -29,4 +30,14 @@ export type GameState = {
     obstacleSpawner: Phaser.Time.TimerEvent;
     shootKey: Phaser.Input.Keyboard.Key;
     bullets: Bullet[];
+};
+export type DestructionShape =
+    | 'none'
+    | 'rectangle'
+    | 'slice'
+    | 'circle';
+
+export type DestructionResult = {
+    amount: number;
+    shape: DestructionShape;
 };
